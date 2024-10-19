@@ -3,13 +3,13 @@ fetch("productList.json")
     .then((data) => Demo(data))
     .catch((error) => console.log("Error: ", error));
 
-let cart = []; // Array to store cart items
+let cart = []; 
 
 function Demo(data) {
     let container = document.getElementById('productList');
 
     data.forEach((item) => {
-        let card = createProductCard(item, false); // false = product list
+        let card = createProductCard(item, false);
         container.appendChild(card);
     });
 }
@@ -54,7 +54,7 @@ function createProductCard(item, isCart) {
     a.classList.add('a');
     buttonGrp.appendChild(a);
 
-    let qty = isCart ? item.cartQty : 1; // Use the cartQty for cart items
+    let qty = isCart ? item.cartQty : 1; 
 
     let btnd = document.createElement("button");
     btnd.innerText = "-";
@@ -77,6 +77,7 @@ function createProductCard(item, isCart) {
     let btni = document.createElement("button");
     btni.innerText = "+";
     btni.classList.add('btni');
+    btni.id = `btnIncrement${item.id}`
     btni.id = isCart ? `cartListIncrement${item.id}` : `btnIncrement${item.id}`;
     btni.addEventListener('click', () => {
         qty++;
@@ -92,6 +93,7 @@ function createProductCard(item, isCart) {
         addtocart.addEventListener('click', () => {
             addToCart(item);
         });
+        addToCart.disable = true;
         buttonGrp.appendChild(addtocart);
     } else {
         let removeBtn = document.createElement('button');
@@ -112,24 +114,24 @@ function createProductCard(item, isCart) {
     return card;
 }
 
-// Update both product list and cart list for the same item
+
 function updateQtyAndPrice(id, qty, price) {
     let total = qty * price;
 
-    // Update in the main product list
+   
     document.getElementById(`txtQty${id}`).innerText = qty;
     document.getElementById(`TotalPriceMain${id}`).innerText = `Total: ${total.toFixed(2)}`;
 
-    // Update in the cart list if the item is in the cart
+   
     if (document.getElementById(`cartListtxtQty${id}`)) {
         document.getElementById(`cartListtxtQty${id}`).innerText = qty;
         document.getElementById(`TotalPrice${id}`).innerText = `Total: ${total.toFixed(2)}`;
 
-        // Update the cart array
+        
         let cartItem = cart.find(c => c.id === id);
         if (cartItem) {
             cartItem.cartQty = qty;
-            calculateGrandTotal(); // Update grand total after every change
+            calculateGrandTotal();
         }
     }
 }
@@ -138,23 +140,23 @@ function addToCart(item) {
     let cartList = document.getElementById('cartList');
     let cartItem = cart.find(c => c.id === item.id);
 
-    // Get the quantity from the product list (if already updated there)
+    
     let productQty = parseInt(document.getElementById(`txtQty${item.id}`).innerText) || 1;
 
     if (!cartItem) {
-        // Set the cart quantity to match the product list quantity
+    
         item.cartQty = productQty;
         cart.push(item);
 
-        let cartCard = createProductCard(item, true); // true = cart list
+        let cartCard = createProductCard(item, true); 
         cartList.appendChild(cartCard);
     } else {
-        // If the item is already in the cart, sync the quantities
+       
         cartItem.cartQty = productQty;
         updateQtyAndPrice(item.id, productQty, item.price);
     }
 
-    calculateGrandTotal(); // Update grand total whenever a new item is added
+    calculateGrandTotal(); 
 }
 
 function removeFromCart(id) {
@@ -162,26 +164,26 @@ function removeFromCart(id) {
     let cartItemIndex = cart.findIndex(c => c.id === id);
 
     if (cartItemIndex > -1) {
-        cart.splice(cartItemIndex, 1); // Remove from the cart array
+        cart.splice(cartItemIndex, 1); 
         let cartItem = document.getElementById(`cartItem${id}`);
-        cartList.removeChild(cartItem); // Remove from the DOM
+        cartList.removeChild(cartItem); 
     }
-    calculateGrandTotal(); // Update grand total after removal
+    calculateGrandTotal(); 
 }
 
-// Calculate grand total of all items in the cart
+
 function calculateGrandTotal() {
     let grandTotal = cart.reduce((acc, item) => {
         return acc + (item.cartQty * item.price);
     }, 0);
 
-    let grandTotalElement = document.getElementById('grandTotal');
+    let grandTotalElement = document.getElementById('TotalPrice');
     
-    // Create grand total element only once
+    
     if (!grandTotalElement) {
         grandTotalElement = document.createElement('h4');
-        grandTotalElement.id = 'grandTotal';
-        document.getElementById('cartContainer').appendChild(grandTotalElement); // Append it to a separate container
+        grandTotalElement.id = 'TotalPrice';
+        document.getElementById('cartContainer').appendChild(grandTotalElement); 
     }
     
     grandTotalElement.innerText = `Grand Total: ${grandTotal.toFixed(2)}`;
